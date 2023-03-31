@@ -1,0 +1,43 @@
+
+AWS::ServiceCatalog::Portfolio
+AWS::ServiceCatalog::PortfolioPrincipalAssociation
+AWS::ServiceCatalog::PortfolioProductAssociation
+AWS::ServiceCatalog::PortfolioShare
+
+AWS::ServiceCatalog::CloudFormationProduct
+AWS::ServiceCatalog::CloudFormationProvisionedProduct
+AWS::ServiceCatalog::LaunchRoleConstraint
+AWS::ServiceCatalog::LaunchNotificationConstraint
+AWS::ServiceCatalog::LaunchTemplateConstraint
+
+
+AWS::ServiceCatalog::AcceptedPortfolioShare
+AWS::ServiceCatalog::ResourceUpdateConstraint
+AWS::ServiceCatalog::ServiceAction
+AWS::ServiceCatalog::ServiceActionAssociation
+AWS::ServiceCatalog::StackSetConstraint
+AWS::ServiceCatalog::TagOption
+AWS::ServiceCatalog::TagOptionAssociation
+
+
+
+
+
+
+# ============= Start ==============================
+
+To use Service Catalog you need to: #####
+ Ref URL: https://stackoverflow.com/questions/64782243/create-a-service-catalog-i-am-role-in-cloudformation-template
+
+
+ 1.create a portfolio (AWS::ServiceCatalog::Portfolio)
+ 2.create a product (AWS::ServiceCatalog::CloudFormationProduct)
+ 3.associate product with portfolio (AWS::ServiceCatalog::PortfolioProductAssociation)
+ 4.provision the product (AWS::ServiceCatalog::CloudFormationProvisionedProduct)
+
+ Note: In step 2. when you create a product you need to pass the template that you want to deploy, in your case the template for the IAM role
+
+# ==============  End ==========================
+
+
+

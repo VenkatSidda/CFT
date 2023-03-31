@@ -1,0 +1,180 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'This template creates AWS Service Catalog Product'
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "Service Catalog Product Tags"
+        Parameters:
+          - pAppName
+          - pDept
+          - pUser
+          - pOwner
+      -
+        Label:
+          default: "Service Catalog Product Details"
+        Parameters:
+          - pSCProductName
+          - pSCProductDescription
+          - pSCProductOwner
+          - pSCProductSupport
+          - pSCProductDistributor
+          - pSCSupportEmail
+          - pSCSupportUrl
+      -
+        Label:
+          default: "Service Catalog Product Details"
+        Parameters:
+          - pS3Bucket
+          - pProvisioningArtifactNameParameter
+          - pProvisioningArtifactDescriptionParameter
+
+Parameters:
+
+# Application Name
+  pAppName:
+    Description:    Please specify the Application Name. Used for tagging and resource names. Mandatory LOWER CASE.
+    Type:           String
+    Default:        "XXXX"
+
+# Department
+  pDept:
+    Description:    Please specify the Department. Used for tagging
+    Type:           String
+    Default:        "XXXX"
+
+# User
+  pUser:
+    Description:    Please specify the User. Used for tagging
+    Type:           String
+    Default:        "XXXX"
+
+# Owner
+  pOwner:
+    Description:    Please specify the Owner. Used for tagging
+    Type:           String
+    Default:        "XXXX"
+
+# ServiceCatalog Product Name
+  pSCProductName:
+    Description:    Please specify ServiceCatalog Product Name.
+    Type:           String
+    Default:        "RHEL-9"
+
+# ServiceCatalog Product Name Description
+  pSCProductDescription:
+    Description:    Please specify ServiceCatalog Product Name Description.
+    Type:           String
+    Default:        "ProductDescription"
+
+# ServiceCatalog Product Name Owner
+  pSCProductOwner:
+    Description:    Please specify ServiceCatalog Product Owner.
+    Type:           String
+    Default:        "ProductOwner"
+
+# ServiceCatalog Product Support
+  pSCProductSupport:
+    Description:    Please specify ServiceCatalog Product Support.
+    Type:           String
+    Default:        "IT Support can be reached @support"
+
+# ServiceCatalog Product Distributor
+  pSCProductDistributor:
+    Description:    Please specify ServiceCatalog Product Distributor.
+    Type:           String
+    Default:        "App Vendor"
+
+# ServiceCatalog Product Support Email
+  pSCSupportEmail:
+    Description:    Please specify ServiceCatalog Product Support Email.
+    Type:           String
+    Default:        " "
+
+# ServiceCatalog Product Support URL
+  pSCSupportUrl:
+    Description:    Please specify ServiceCatalog Product Support URL.
+    Type:           String
+    Default:        "XXXX"
+
+# ServiceCatalog Product S3 Bucket
+  pS3Bucket:
+    Description:    Please specify ServiceCatalog Product S3 Bucket.
+    Type:           String
+    Default:        "mytestbucket-servicecatalog"
+
+# ServiceCatalog Product Artifact Name
+  pProductArtifactName:
+    Description:    Please specify ServiceCatalog Product Artifact Name.
+    Type:           String
+    Default:        "ec2-cf.yaml"
+
+# ServiceCatalog Product Artifact Name
+  pProvisioningArtifactNameParameter:
+    Description:    Please specify ServiceCatalog Product Artifact Name.
+    Type:           String
+    Default:        "ProductExample"
+
+# ServiceCatalog Product Artifact Description
+  pProvisioningArtifactDescriptionParameter:
+    Description:    Please specify ServiceCatalog Product Artifact Description.
+    Type:           String
+    Default:        "ProductExample"
+
+Resources:
+
+  rRHEL9ServiceCatalogCloudFormationProduct:
+    Type: "AWS::ServiceCatalog::CloudFormationProduct"
+    Properties:
+      Name: !Ref 'pSCProductName'
+      Description: !Ref 'pSCProductDescription'
+      Owner: !Ref 'pSCProductOwner'
+      Distributor:  !Ref 'pSCProductDistributor'
+      SupportDescription: !Ref 'pSCProductSupport'
+      SupportEmail:  !Ref 'pSCSupportEmail'
+#      SupportUrl: !Sub '${SCSupportUrl}'
+      Tags:
+        - Key:    Name
+          Value:  !Sub '${pAppName}'
+        - Key:    App
+          Value:  !Sub '${pAppName}'
+        - Key:    Dept
+          Value:  !Sub '${pDept}'
+        - Key:    User
+          Value:  !Sub '${pUser}'
+        - Key:    Owner
+          Value:  !Sub '${pOwner}'
+      ProvisioningArtifactParameters:
+        -
+          Name: !Sub '${pProvisioningArtifactNameParameter}'
+          Description: !Sub '${pProvisioningArtifactDescriptionParameter}'
+          Info:
+            LoadTemplateFromURL: !Sub "https://${pS3Bucket}.s3.${AWS::Region}.amazonaws.com/${pProductArtifactName}"
+
+  ServiceCatalogPortfolioProductAssociation:
+    Type: "AWS::ServiceCatalog::PortfolioProductAssociation"
+    Properties:
+      PortfolioId:
+          Fn::ImportValue: eServiceCatalogPortfolioID
+      ProductId: !Ref 'rRHEL9ServiceCatalogCloudFormationProduct'
+
+
+
+Outputs:
+
+  oRHEL9ServiceCatalogCloudFormationProduct:
+    Value:    !GetAtt 'rRHEL9ServiceCatalogCloudFormationProduct.ProductName'
+    Export:
+      Name: eRHEL9ServiceCatalogCloudFormationProduct
+
+  rRHEL9ServiceCatalogCloudFormationProductProvisioningArtifactIds:
+    Value:    !GetAtt 'rRHEL9ServiceCatalogCloudFormationProduct.ProvisioningArtifactIds'
+    Export:
+      Name:   eRHEL9ServiceCatalogCloudFormationProductProvisioningArtifactIds
+
+  rRHEL9ServiceCatalogCloudFormationProductProvisioningArtifactName:
+    Value:    !GetAtt 'rRHEL9ServiceCatalogCloudFormationProduct.ProvisioningArtifactNames'
+    Export:
+      Name:   rRHEL9ServiceCatalogCloudFormationProductProvisioningArtifactName

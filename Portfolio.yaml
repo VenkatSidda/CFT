@@ -1,0 +1,131 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "This template creates AWS Service Catalog Portfolio"
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "Service Catalog Portfolio Details"
+        Parameters:
+          - pPortfolioDisplayName
+          - pPortfolioProviderName
+          - pPortfolioDescription
+      -
+        Label:
+          default: "Service Catalog Portfolio Tags"
+        Parameters:
+          - pName
+          - pDept
+          - pUser
+          - pOwner
+      -
+        Label:
+          default: "Portfolio Sharing"
+        Parameters:
+          - pShareThisPortfolio
+          - pAccountIdOfChildAWSAccount
+          - pServiceCatalogPortfolio
+
+Parameters:
+
+# Department
+  pDept:
+    Description:    Please specify the Department. Used for tagging
+    Type:           String
+    Default:        "XXXX"
+
+# User
+  pUser:
+    Description:    Please specify the User. Used for tagging
+    Type:           String
+    Default:        "XXXX"
+
+# Owner
+  pOwner:
+    Description:    Please specify the Owner. Used for tagging
+    Type:           String
+    Default:        "XXXX"
+
+
+# Portfolio Provider Name
+  pPortfolioProviderName:
+    Description:    Please specify the Portfolio Provider Name.
+    Type:           String
+    Default:        "RHEL-9-PORTFOLIO"
+
+# Portfolio Description
+  pPortfolioDescription:
+    Description:    Please specify the Portfolio Description.
+    Type:           String
+    Default:        "Service Catalog Portfolio for Business Unit (BU)"
+
+# Portfolio Display Name
+  pPortfolioDisplayName:
+    Description:    Please specify the Portfolio Description. Must satisfy regular expression pattern, (^[a-zA-Z0-9_\-]*)
+    Type:           String
+    Default:        "Test_Portfolio"
+
+
+# Share Portfolio
+  pShareThisPortfolio:
+    Description:    Please specify if this Portfolio will be Shared with additonal accounts?
+    Type:           String
+    Default:        "false"
+    AllowedValues:
+      - 'true'
+      - 'false'
+
+# AccountId
+  pAccountIdOfChildAWSAccount:
+    Description:    Please specify the Sub AWS Account ID.
+    Type:           String
+    Default:        "1234567890"
+  
+  pServiceCatalogPortfolio:
+    Description:    Please specify the Sub AWS Account ID.
+    Type:           String
+    Default:        "1234567890"
+
+
+Conditions:
+
+  ConditionShareThisPortfolio: !Equals [ !Ref pShareThisPortfolio, 'true']
+
+Resources:
+
+  rServiceCatalogPortfolio:
+    Type: "AWS::ServiceCatalog::Portfolio"
+    Properties:
+      ProviderName: !Ref 'pPortfolioProviderName'
+      Description: !Ref 'pPortfolioDescription'
+      DisplayName: !Ref 'pPortfolioDisplayName'
+      Tags:
+        - Key:    Name
+          Value:  !Sub '${pPortfolioDisplayName}'
+        - Key:    Dept
+          Value:  !Sub '${pDept}'
+        - Key:    User
+          Value:  !Sub '${pUser}'
+        - Key:    Owner
+          Value:  !Sub '${pOwner}'
+
+
+  rServiceCatalogPortfolioShare:
+    Type: "AWS::ServiceCatalog::PortfolioShare"
+    Condition: ConditionShareThisPortfolio
+    Properties:
+      AccountId: !Ref 'pAccountIdOfChildAWSAccount'
+      PortfolioId: !Ref 'pServiceCatalogPortfolio'
+
+Outputs:
+
+  oServiceCatalogPortfolio:
+    Value:    !Ref 'rServiceCatalogPortfolio'
+    Export:
+      Name:   eServiceCatalogPortfolioID
+
+  oServiceCatalogPortfolioName:
+    Value:    !GetAtt 'rServiceCatalogPortfolio.PortfolioName'
+    Export:
+      Name:   eServiceCatalogPortfolioName

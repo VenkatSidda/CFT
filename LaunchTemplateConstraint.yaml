@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: To provision to ec2 instance
+Parameters:
+  pLaunchtemplatename:
+    Type: String
+    Default: "rhel-9-launchtemplatename"
+
+Resources:
+
+  rTestEC2Instance:
+    Type: 'AAWS::ServiceCatalog::LaunchTemplateConstraint'
+    Properties:
+#      Description: 
+      PortfolioId:
+      ProductId:
+      Rules:
+
+
+Outputs:
+  oTestEC2InstanceID:
+    Value: !Ref rTestEC2Instance
+    Export:
+      Name: oTestEC2InstanceID
