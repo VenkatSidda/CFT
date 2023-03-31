@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  pRolename:
+    Type: String
+    Default: "aws-ec2-ssh-role"
+  pinstanceprofilename:
+    Type: String
+    Default: 'aws-ec2-ssm-instanceprofile-role'
+
+Resources: 
+  rec2ssmRole: 
+    Type: "AWS::IAM::Role"
+    Properties: 
+      RoleName: !Ref pRolename
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "ec2.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      ManagedPolicyArns: 
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Path: "/"
+
+  rec2ssminstanceprofile: 
+    Type: "AWS::IAM::InstanceProfile"
+    Properties: 
+      InstanceProfileName: !Ref pinstanceprofilename
+      Path: "/"
+      Roles: 
+        - !Ref rec2ssmRole
+Outputs:            
+  oec2ssminstanceprofile:
+    Value: !GetAtt  rec2ssminstanceprofile.Arn
+    Export:
+      Name: eEc2ssminstanceprofile

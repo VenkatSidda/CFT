@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: To provision to ec2 instance
+Metadata:
+  'AWS::CloudFormation::Interface':
+    ParameterGroups:
+      - Label:
+          default: Select VPC Security Group and Availability Zone
+        Parameters:
+          - pAzname
+      - Label:
+          default: Selecte Asubnet type  AppSubnetsIdMap eu-central-1
+        Parameters:
+          - pInstanceType
+
+Parameters:
+  pAzname:
+    Description: Select AZ
+    Type: 'AWS::EC2::AvailabilityZone::Name'
+  
+  pApptype:
+    Description: Select app type
+    Type: String
+    AllowedValues:
+      - AppSubnetsIdMap
+      - DBSubnetsIdMap
+
+  pInstanceType:
+    Description: "Select Instance Type"
+    Type: String
+    Default: "t2.micro"
+    AllowedValues:
+      - t2.nano
+      - t2.micro
+      - t2.small
+
+Mappings:
+  AppSubnetsIdMap:
+    eu-central-1a:
+      SubnetId: subnet-09d9fb5587b89c7be
+    eu-central-1b:
+      SubnetId: subnet-067759f5457630dfa
+    eu-central-1c:
+      SubnetId: subnet-0e0bb81271587977d
+  DBSubnetsIdMap:
+    eu-west-1a:
+      SubnetId: subnet-0c0985f6b5aada3c6
+    eu-west-1b:
+      SubnetId: subnet-06fcd0b799f34a164
+    eu-west-1c:
+      SubnetId: subnet-0092b99c15bfd89c5
+
+Resources:
+
+  rTestEC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: !Ref pInstanceType
+      LaunchTemplate:
+        LaunchTemplateId: !ImportValue eTestLaunchTemplateID
+        Version: !ImportValue eTestLaunchTemplateVersionNo
+      NetworkInterfaces:
+        - SubnetId: 
+            'Fn::FindInMap':
+              - !Ref pApptype
+              - !Ref pAzname
+              - SubnetId
+          DeviceIndex: 0
+          AssociatePublicIpAddress: false
+Outputs:
+  oTestEC2InstanceID:
+    Value: !Ref rTestEC2Instance
+    Export:
+      Name: oTestEC2InstanceID

@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: To provision to ec2 instance
+Parameters:
+  pLaunchtemplatename:
+    Type: String
+    Default: "rhel-9-launchtemplatename"
+
+Mappings:
+  AWSRegionAMI:
+    eu-west-1:
+      mImageId: ami-00169914e6299b8e0
+    eu-central-1:
+      mImageId: ami-00ad2436e75246bba
+
+Resources:
+  rTestLaunchTemplate:
+    Type: 'AWS::EC2::LaunchTemplate'
+    Properties:
+      LaunchTemplateName: !Ref pLaunchtemplatename
+      LaunchTemplateData:
+        IamInstanceProfile:
+          Arn: !ImportValue eEc2ssminstanceprofile
+        ImageId: !FindInMap 
+          - AWSRegionAMI
+          - !Ref 'AWS::Region'
+          - mImageId
+        MetadataOptions:
+          HttpTokens: required
+          HttpPutResponseHopLimit: 1
+        Monitoring:
+          Enabled: true
+      TagSpecifications:
+        - ResourceType: launch-template
+          Tags:
+            - Key: Name
+              Value: Test
+
+Outputs:            
+  oTestLaunchTemplateID:
+    Value: !Ref rTestLaunchTemplate
+    Export:
+      Name: eTestLaunchTemplateID
+
+  oTestLaunchTemplateVersionNo:
+    Value: !GetAtt  rTestLaunchTemplate.DefaultVersionNumber
+    Export:
+      Name: eTestLaunchTemplateVersionNo
