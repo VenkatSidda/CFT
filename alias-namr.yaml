@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: This template creates AWS Service Catalog Portfolio
+Resources:
+  ConvertListMacroFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Handler: index.lambda_handler
+      Runtime: python3.9
+      Timeout: 30
+      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/Lambda-Role'
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          import botocore
+
+          def lambda_handler(event, context):
+              
+
+              def get_account_contact_info():
+                  try:
+                    client = boto3.client('account')
+                    response = dict()
+                    response = client.get_contact_information()
+                  except botocore.exceptions.ClientError as error:
+                    response["status"] = "failure"
+                    response["errorMessage"] = str(error)
+                  return response
+                  
+              def add_account_allias(account_alias_name):
+                  try:
+                      client = boto3.client('iam')
+                      response = dict()
+                      response = client.create_account_alias(
+                          AccountAlias=account_alias_name
+                      )
+                  except botocore.exceptions.ClientError as error:
+                      response["status"] = "failure"
+                      response["errorMessage"] = str(error)
+                  return response
+                  
+              get_account_contactinfo = list()
+              get_account_contactinfo = get_account_contact_info()['ContactInformation']
+              account_alias_name = get_account_contactinfo['FullName']
+              account_contactinfo_split = account_alias_name.split(".")
+              paccount_alias_name = '-'.join(account_contactinfo_split)
+              print(account_alias_name)
+    
+              #
+              print('paccount_alias_name: ', paccount_alias_name)
+              account_alias = add_account_allias(paccount_alias_name)
+              print(account_alias)
+
+  Primerinvoke:
+    Type: AWS::CloudFormation::CustomResource
+    DependsOn: ConvertListMacroFunction
+    Version: "1.0"
+    Properties:
+      ServiceToken: !GetAtt ConvertListMacroFunction.Arn
+
+
+
+"""
+  def get_unlock_cloudwatch_event_data(event):
+      print('event:')
+      print(event)
+      print('context:')
+      print(context)
+      cloudwatch_data_dict = dict()
+      cloudwatch_data_dict = event['detail']
+      return  cloudwatch_data_dict
+
+  Type: 'Custome::lambdaCallout'
+  Properties:
+    ServiceToken: !GetAtt
+"""
+      
