@@ -58,20 +58,3 @@ Resources:
     Properties:
       ServiceToken: !GetAtt ConvertListMacroFunction.Arn
 
-
-
-"""
-  def get_unlock_cloudwatch_event_data(event):
-      print('event:')
-      print(event)
-      print('context:')
-      print(context)
-      cloudwatch_data_dict = dict()
-      cloudwatch_data_dict = event['detail']
-      return  cloudwatch_data_dict
-
-  Type: 'Custome::lambdaCallout'
-  Properties:
-    ServiceToken: !GetAtt
-"""
-      
