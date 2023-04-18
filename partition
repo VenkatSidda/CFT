@@ -3,3 +3,40 @@ https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/st
 https://www.thegeekdiary.com/how-to-move-var-on-a-separate-disk-as-a-separate-mount-point-online/
 https://www.alibabacloud.com/help/en/elastic-compute-service/latest/resize-partitions-and-file-systems-of-linux-system-disks
 https://www.daniloaz.com/en/partitioning-and-resizing-the-ebs-root-volume-of-an-aws-ec2-instance/
+
+
+
+ls -LZ
+df -h
+
+
+du -sh
+diff /usr/ /tmp/usr/
+diff -qr 
+    r => to read the subdirectories
+	q => which will report only when the difference is found.
+	-q, --brief
+	-r, --recursive
+diff -qrs  => 
+    s => it will show both identical and different files of directories
+
+# du /usr/
+# du /tmp/usrtmp/
+
+
+blkid /dev/mapper/rhel-usr => To Get UUID
+
+$ sudo shopt -s dotglob
+$ sudo rsync -aulvXpogtr /var/* /mnt
+
+   # getenforce   => If SELinux is in Enforcing/Permission state
+   # restorecon -vvFR /usr   => Restore the selinux context
+   
+   
+   
+mkfs -t ext4 /dev/xvdf1
+du -a	List all files and directories size
+du -h	Display in human readable format
+du -c	Display grand total in the output
+du -s	Display only total
+du -ch  linuxteck
