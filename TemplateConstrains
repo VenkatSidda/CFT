@@ -1,0 +1,15 @@
+https://awsdocs.s3.amazonaws.com/servicecatalog/development-environment.template
+
+
+{
+  "Rules": {
+    "Rule1": {
+      "Assertions": [
+        {
+          "Assert" : {"Fn::Contains": [["t2.micro", "t2.small"], {"Ref": "InstanceType"}]},
+          "AssertDescription": "Instance type should be t2.micro or t2.small"
+        }
+      ]
+    }
+  }
+} 
